@@ -1,7 +1,7 @@
 {
   "name": "compute-roundn",
   "version": "0.0.0",
-  "description": "Rounds a value to the nearest multiple of 10^n.",
+  "description": "Round values to the nearest multiple of 10^n.",
   "author": {
     "name": "Athan Reines",
     "email": "kgryte@gmail.com"
