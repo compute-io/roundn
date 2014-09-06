@@ -25,7 +25,10 @@
   "keywords": [
     "compute.io",
     "compute",
-    "computation"
+    "computation",
+    "round",
+    "data",
+    "array"
   ],
   "bugs": {
     "url": "https://github.com/compute-io/roundn/issues"
