@@ -22,7 +22,14 @@ To use the module,
 var roundn = require( 'compute-roundn' );
 ```
 
-`roundn()` accepts two input arguments: `x` and `n`. `x` may be either an array of values or a single numeric value. `n` must be an `integer` specifying the multiple of `10^n` to which the value(s) should be rounded.
+#### roundn( x, n )
+
+Rounds values to the nearest multiple of `10^n`. `x` may be either a numeric `array` or a single numeric value. `n` must be an `integer` specifying the multiple of `10^n` to which the value(s) should be rounded.
+
+``` javascript
+var val = roundn( 2.4567, -2 );
+// returns 2.46
+```
 
 
 ## Examples
@@ -30,18 +37,18 @@ var roundn = require( 'compute-roundn' );
 ``` javascript
 // Round a value to 2 decimal places:
 console.log( roundn( Math.PI, -2 ) );
-// Returns 3.14
+// returns 3.14
 
 // If `n=0`, then `roundn()` behaves like `Math.round()`:
 console.log( roundn( Math.PI, 0 ) );
-// Returns 3
+// returns 3
 
 console.log( Math.round( Math.PI ) );
-// Returns 3
+// returns 3
 
 // Round a value to the nearest thousand:
 console.log( roundn( 12368, 3 ) );
-// Returns 12000
+// returns 12000
 
 // Round each array value to 2 decimal places...
 var data = new Array( 5 );
@@ -51,13 +58,25 @@ for ( var i = 0; i < data.length; i++ ) {
 }
 
 console.log( roundn( data, -2 ) );
-// Returns [ 3.14, 3.14, 3.14, 3.14, 3.14 ]
+// returns [ 3.14, 3.14, 3.14, 3.14, 3.14 ]
 ```
 
 To run the example code from the top-level application directory,
 
 ``` bash
 $ node ./examples/index.js
+```
+
+
+## Notes
+
+If provided an input `array`, the `array` is mutated. If mutation is undesired,
+
+``` javascript
+var data = [ Math.PI, Math.PI, Math.PI ],
+	copy = data.slice();
+
+round( copy, -2 );
 ```
 
 
@@ -85,7 +104,7 @@ $ make test-cov
 Istanbul creates a `./reports/coverage` directory. To access an HTML version of the report,
 
 ``` bash
-$ open reports/coverage/lcov-report/index.html
+$ make view-cov
 ```
 
 
