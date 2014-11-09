@@ -79,6 +79,8 @@ var data = [ Math.PI, Math.PI, Math.PI ],
 round( copy, -2 );
 ```
 
+If provided an empty `array`, the function returns `null`.
+
 
 ## Tests
 
