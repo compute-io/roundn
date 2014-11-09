@@ -23,7 +23,7 @@ describe( 'compute-roundn', function tests() {
 		expect( roundn ).to.be.a( 'function' );
 	});
 
-	it( 'should throw an error if not provided a filled array or numeric value', function test(){
+	it( 'should throw an error if not provided an array or numeric value', function test(){
 		var values = [
 			'5',
 			true,
