@@ -1,3 +1,4 @@
+'use strict';
 
 // MODULES //
 
@@ -17,7 +18,6 @@ var expect = chai.expect,
 // TESTS //
 
 describe( 'compute-roundn', function tests() {
-	'use strict';
 
 	it( 'should export a function', function test() {
 		expect( roundn ).to.be.a( 'function' );
@@ -25,14 +25,14 @@ describe( 'compute-roundn', function tests() {
 
 	it( 'should throw an error if not provided a filled array or numeric value', function test(){
 		var values = [
-				'5',
-				true,
-				undefined,
-				null,
-				NaN,
-				function(){},
-				{}
-			];
+			'5',
+			true,
+			undefined,
+			null,
+			NaN,
+			function(){},
+			{}
+		];
 
 		for ( var i = 0; i < values.length; i++ ) {
 			expect( badValue( values[i] ) ).to.throw( TypeError );
@@ -46,16 +46,16 @@ describe( 'compute-roundn', function tests() {
 
 	it( 'should throw an error if not provided an integer power', function test(){
 		var values = [
-				'5',
-				5.326,
-				true,
-				undefined,
-				null,
-				NaN,
-				[],
-				function(){},
-				{}
-			];
+			'5',
+			5.326,
+			true,
+			undefined,
+			null,
+			NaN,
+			[],
+			function(){},
+			{}
+		];
 
 		for ( var i = 0; i < values.length; i++ ) {
 			expect( badValue( values[i] ) ).to.throw( TypeError );

@@ -1,3 +1,5 @@
+'use strict';
+
 var roundn = require( './../lib' );
 
 // Round a value to 2 decimal places:
