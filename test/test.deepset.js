@@ -33,7 +33,7 @@ describe( 'deepset roundn', function tests() {
 			{'x': Math.PI},
 			{'x': Math.PI},
 			{'x': Math.PI},
-			{'x': Math.PI}
+			{'x': null}
 		];
 
 		data = roundn( data, -2, 'x' );
@@ -43,7 +43,8 @@ describe( 'deepset roundn', function tests() {
 			{'x': 3.14},
 			{'x': 3.14},
 			{'x': 3.14},
-			{'x': 3.14}
+			// for nun-numeric values, return NaN
+			{'x': NaN}
 		];
 
 		assert.deepEqual( data, expected );

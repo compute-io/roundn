@@ -34,13 +34,24 @@ describe( 'array roundn', function tests() {
 		for ( i = 0; i < data.length; i++ ) {
 			data[ i ] = Math.PI;
 			expected[ i ] = 3.14;
+
+			// for nun-numeric values, return NaN
+			if ( i === data.length - 1 ) {
+				data[ i ] = null;
+				expected[ i ] = NaN;
+			}
 		}
+
 
 		actual = roundn( actual, data, -2 );
 
 		assert.deepEqual( actual, expected );
 
 		// Typed arrays...
+
+		// float64 arrays cannot contain null
+		data[ data.length - 1 ] = NaN;
+		
 		data = new Float64Array( data );
 		actual = new Float64Array( data.length );
 

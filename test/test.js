@@ -9,6 +9,8 @@ var // Expectation library:
 	// Matrix data structure:
 	matrix = require( 'dstructs-matrix' ),
 
+	// Validate if a value is NaN:
+	isnan = require( 'validate.io-nan' ),
 	// Module to be tested:
 	roundn = require( './../lib' );
 
@@ -27,7 +29,7 @@ describe( 'compute-roundn', function tests() {
 		expect( roundn ).to.be.a( 'function' );
 	});
 
-	it( 'should throw an error if the first argument is neither a number or array-like or matrix-like', function test() {
+	it( 'should return NaN if the first argument is neither a number or array-like or matrix-like', function test() {
 		var values = [
 			// '5', // valid as is array-like (length)
 			true,
@@ -39,11 +41,28 @@ describe( 'compute-roundn', function tests() {
 		];
 
 		for ( var i = 0; i < values.length; i++ ) {
+				assert.isTrue( isnan( roundn( values[ i ], 0 ) ) );
+			}
+	});
+
+	it( 'should throw an error if not provided an integer power', function test(){
+		var values = [
+			'5',
+			5.326,
+			true,
+			null,
+			NaN,
+			[],
+			function(){},
+			{}
+		];
+
+		for ( var i = 0; i < values.length; i++ ) {
 			expect( badValue( values[i] ) ).to.throw( TypeError );
 		}
 		function badValue( value ) {
 			return function() {
-				roundn( value );
+				roundn( Math.PI, value );
 			};
 		}
 	});
@@ -65,7 +84,7 @@ describe( 'compute-roundn', function tests() {
 		}
 		function badValue( value ) {
 			return function() {
-				roundn( [1,2,3], {
+				roundn( [1,2,3], 0, {
 					'accessor': value
 				});
 			};
@@ -83,7 +102,7 @@ describe( 'compute-roundn', function tests() {
 		}
 		function badValue( value ) {
 			return function() {
-				roundn( [1,2,3], {
+				roundn( [1,2,3], 0, {
 					'dtype': value
 				});
 			};
@@ -101,7 +120,7 @@ describe( 'compute-roundn', function tests() {
 		}
 		function badValue( value ) {
 			return function() {
-				roundn( matrix( [2,2] ), {
+				roundn( matrix( [2,2] ), 0, {
 					'dtype': value
 				});
 			};

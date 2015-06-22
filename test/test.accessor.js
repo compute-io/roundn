@@ -33,12 +33,13 @@ describe( 'accessor roundn', function tests() {
 			{'x': Math.PI},
 			{'x': Math.PI},
 			{'x': Math.PI},
-			{'x': Math.PI}
+			// for nun-numeric values, return NaN
+			{'x': null}
 		];
 		actual = new Array( data.length );
 
 		actual = roundn( actual, data, -2, getValue );
-		expected = [ 3.14, 3.14, 3.14, 3.14, 3.14, 3.14  ];
+		expected = [ 3.14, 3.14, 3.14, 3.14, 3.14, NaN  ];
 
 		assert.deepEqual( actual, expected );
 
