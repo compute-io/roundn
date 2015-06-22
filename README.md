@@ -16,21 +16,240 @@ For use in the browser, use [browserify](https://github.com/substack/node-browse
 
 ## Usage
 
-To use the module,
 
 ``` javascript
 var roundn = require( 'compute-roundn' );
 ```
 
-#### roundn( x, n )
+#### roundn( x[, n[, options ] ] )
 
-Rounds values to the nearest multiple of `10^n`. `x` may be either a numeric `array` or a single numeric value. `n` must be an `integer` specifying the multiple of `10^n` to which the value(s) should be rounded.
+Rounds values to the nearest multiple of `10^n`. `x` may be either a [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number), an [`array`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array), a [`typed array`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays), or a [`matrix`](https://github.com/dstructs/matrix).
+. `n` must be an `integer` specifying the multiple of `10^n` to which the value(s) should be rounded. If `n` and `options` are not supplied, the function behaves like `Math.round`.
 
 ``` javascript
-var val = roundn( 2.4567, -2 );
+var matrix = require( 'dstructs-matrix' ),
+	data,
+	mat,
+	out,
+	i;
+
+out = roundn( 2.32 );
+// returns 2
+
+out = roundn( 2.4567, -2 );
 // returns 2.46
+
+out = roundn( 12368, 3 )
+// returns 12,000
+
+data = [ Math.PI, Math.PI, Math.PI ];
+out = roundn( data, -2 );
+// returns [ 3.14, 3.14, 3.14 ]
+
+data = new Float64Array( data );
+out = roundn( data, -2 );
+// returns Float64Array( [3.14, 3.14, 3.14] )
+
+data = new Float64Array( 6 );
+for ( i = 0; i < 6; i++ ) {
+	data[ i ] = Math.PI;
+}
+mat = matrix( data, [3,2], 'float64' );
+/*
+	[  Math.PI Math.PI
+	   Math.PI Math.PI
+	   Math.PI Math.PI ]
+*/
+
+out = roundn( mat, -2 );
+/*
+	[ 3.14 3.14
+	  3.14 3.14
+	  3.14 3.14 ]
+*/
 ```
 
+The function accepts the following `options`:
+
+* 	__accessor__: accessor `function` for accessing `array` values.
+* 	__dtype__: output [`typed array`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays) or [`matrix`](https://github.com/dstructs/matrix) data type. Default: `float64`.
+*	__copy__: `boolean` indicating if the `function` should return a new data structure. Default: `true`.
+*	__path__: [deepget](https://github.com/kgryte/utils-deep-get)/[deepset](https://github.com/kgryte/utils-deep-set) key path.
+*	__sep__: [deepget](https://github.com/kgryte/utils-deep-get)/[deepset](https://github.com/kgryte/utils-deep-set) key path separator. Default: `'.'`.
+
+For non-numeric `arrays`, provide an accessor `function` for accessing `array` values.
+
+``` javascript
+data = [
+	{'x': Math.PI},
+	{'x': Math.PI},
+	{'x': Math.PI},
+	{'x': Math.PI},
+	{'x': Math.PI},
+];
+function getValue( d, i ) {
+	return d.x;
+}
+
+var out = roundn( data, -2,  {
+	'accessor': getValue
+});
+// returns [ 3.14, 3.14, 3.14, 3.14, 3.14 ]
+```
+
+To [deepset](https://github.com/kgryte/utils-deep-set) an object `array`, provide a key path and, optionally, a key path separator.
+
+``` javascript
+data = [
+	{'x':[9,Math.PI]},
+	{'x':[9,Math.PI]},
+	{'x':[9,Math.PI]},
+	{'x':[9,Math.PI]},
+	{'x':[9,Math.PI]},
+	{'x':[9,Math.PI]}
+];
+
+var out = roundn( data, -2, {
+	'path': 'x|1',
+	'sep': '|'
+});
+/*
+	[
+		{'x':[9,3.14]},
+		{'x':[9,3.14]},
+		{'x':[9,3.14]},
+		{'x':[9,3.14]},
+		{'x':[9,3.14]},
+		{'x':[9,3.14]}
+	]
+*/
+
+var bool = ( data === out );
+// returns true
+```
+
+By default, when provided a [`typed array`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays) or [`matrix`](https://github.com/dstructs/matrix), the output data structure is `float64` in order to preserve precision. To specify a different data type, set the `dtype` option (see [`matrix`](https://github.com/dstructs/matrix) for a list of acceptable data types).
+
+``` javascript
+var data, out;
+
+data = new Float32Array( [ -0.1, 0.1, 10, -10] );
+
+out = abs( data, {
+	'dtype': 'int32'
+});
+// returns Int32Array( [0, 0, 10, 10] )
+
+// Works for plain arrays, as well...
+out = abs( [ -0.1, 0.1, 10, -10], {
+	'dtype': 'uint8'
+});
+// returns Uint8Array( [0, 0, 10, 10] )
+```
+
+By default, the function returns a new data structure. To mutate the input data structure, set the `copy` option to `false`.
+
+``` javascript
+var data,
+	bool,
+	mat,
+	out,
+	i;
+
+data = [ Math.PI, Math.PI, Math.PI ];
+
+out = roundn( data, -2, {
+	'copy': false
+});
+// returns [ 3.14, 3.14, 3.14 ]
+
+bool = ( data === out );
+// returns true
+
+data = new Float64Array( 6 );
+for ( i = 0; i < 6; i++ ) {
+	data[ i ] = Math.PI;
+}
+mat = matrix( data, [3,2], 'float64' );
+/*
+	[  Math.PI Math.PI
+	   Math.PI Math.PI
+	   Math.PI Math.PI ]
+*/
+
+out = roundn( mat, -2, {
+	'copy': false
+});
+/*
+	[ 3.14 3.14
+	  3.14 3.14
+	  3.14 3.14 ]
+*/
+
+bool = ( mat === out );
+// returns true
+```
+
+
+## Notes
+
+*	If an element is __not__ a numeric value, the element's absolute value is `NaN`.
+
+	``` javascript
+	var data, out;
+
+	out = roundn( null );
+	// returns NaN
+
+	out = roundn( true );
+	// returns NaN
+
+	out = roundn( {'a':'b'} );
+	// returns NaN
+
+	out = roundn( [ -1, null, -2 ] );
+	// returns [ -1, NaN, -2 ]
+
+	function getValue( d, i ) {
+		return d.x;
+	}
+	data = [
+		{'x': Math.PI},
+		{'x': Math.PI},
+		{'x': Math.PI},
+		{'x': Math.PI},
+		{'x': Math.PI},
+		{'x': null}
+	];
+
+	out = roundn( data, -2, {
+		'accessor': getValue
+	});
+	// returns [ 3.14, 3.14, 3.14, 3.14, 3.14, NaN ]
+
+	out = roundn( data, -2, {
+		'path': 'x'
+	});
+	/*
+		[
+			{'x': 3.14},
+			{'x': 3.14},
+			{'x': 3.14},
+			{'x': 3.14},
+			{'x': 3.14},
+			{'x': NaN}
+		]
+	*/
+	```
+
+*	Be careful when providing a data structure which contains non-numeric elements and specifying an `integer` output `array`, as `NaN` values are cast to `0`.
+
+	``` javascript
+	var out = roundn( [ -1, null, -2 ], 0, {
+		'dtype': 'int8'
+	});
+	// returns Int8Array( [-1,0,-2] );
+	```
 
 ## Examples
 
@@ -67,26 +286,11 @@ To run the example code from the top-level application directory,
 $ node ./examples/index.js
 ```
 
-
-## Notes
-
-If provided an input `array`, the `array` is mutated. If mutation is undesired,
-
-``` javascript
-var data = [ Math.PI, Math.PI, Math.PI ],
-	copy = data.slice();
-
-round( copy, -2 );
-```
-
-If provided an empty `array`, the function returns `null`.
-
-
 ## Tests
 
 ### Unit
 
-Unit tests use the [Mocha](http://visionmedia.github.io/mocha) test framework with [Chai](http://chaijs.com) assertions. To run the tests, execute the following command in the top-level application directory:
+Unit tests use the [Mocha](http://mochajs.org) test framework with [Chai](http://chaijs.com) assertions. To run the tests, execute the following command in the top-level application directory:
 
 ``` bash
 $ make test
@@ -110,16 +314,15 @@ $ make view-cov
 ```
 
 
+---
 ## License
 
-[MIT license](http://opensource.org/licenses/MIT). 
+[MIT license](http://opensource.org/licenses/MIT).
 
 
----
 ## Copyright
 
-Copyright &copy; 2014. Athan Reines.
-
+Copyright &copy; 2014-2015. The [Compute.io](https://github.com/compute-io) Authors.
 
 [npm-image]: http://img.shields.io/npm/v/compute-roundn.svg
 [npm-url]: https://npmjs.org/package/compute-roundn
