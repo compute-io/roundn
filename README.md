@@ -133,18 +133,18 @@ By default, when provided a [`typed array`](https://developer.mozilla.org/en-US/
 ``` javascript
 var data, out;
 
-data = new Float32Array( [ -0.1, 0.1, 10, -10] );
+data = new Float32Array( [ Math.PI, Math.PI, Math.PI, Math.PI ] );
 
-out = abs( data, {
+out = roundn( data, -2, {
 	'dtype': 'int32'
 });
-// returns Int32Array( [0, 0, 10, 10] )
+// returns Int32Array( [3, 3, 3, 3] )
 
 // Works for plain arrays, as well...
-out = abs( [ -0.1, 0.1, 10, -10], {
+out = roundn( [ Math.PI, Math.PI, Math.PI, Math.PI ], -2, {
 	'dtype': 'uint8'
 });
-// returns Uint8Array( [0, 0, 10, 10] )
+// returns Uint8Array( [3, 3, 3, 3] )
 ```
 
 By default, the function returns a new data structure. To mutate the input data structure, set the `copy` option to `false`.
@@ -254,30 +254,86 @@ bool = ( mat === out );
 ## Examples
 
 ``` javascript
+var matrix = require( 'dstructs-matrix' ),
+	roundn = require( 'compute-roundn' );
+
+
+var data,
+	mat,
+	out,
+	tmp,
+	i;
+
 // Round a value to 2 decimal places:
-console.log( roundn( Math.PI, -2 ) );
+out = roundn( Math.PI, -2 );
+console.log( out );
 // returns 3.14
 
 // If `n=0`, then `roundn()` behaves like `Math.round()`:
-console.log( roundn( Math.PI, 0 ) );
+out = roundn( Math.PI, 0 );
+console.log( out );
 // returns 3
 
-console.log( Math.round( Math.PI ) );
+out = Math.round( Math.PI );
+console.log( out );
 // returns 3
 
 // Round a value to the nearest thousand:
-console.log( roundn( 12368, 3 ) );
-// returns 12000
+out = roundn( 12368, 3 );
 
-// Round each array value to 2 decimal places...
-var data = new Array( 5 );
-
-for ( var i = 0; i < data.length; i++ ) {
+// Plain arrays...
+data = new Array( 10 );
+for ( i = 0; i < data.length; i++ ) {
 	data[ i ] = Math.PI;
 }
+out = roundn( data, -2 );
 
-console.log( roundn( data, -2 ) );
-// returns [ 3.14, 3.14, 3.14, 3.14, 3.14 ]
+// Object arrays (accessors)...
+function getValue( d ) {
+	return d.x;
+}
+for ( i = 0; i < data.length; i++ ) {
+	data[ i ] = {
+		'x': data[ i ]
+	};
+}
+out = roundn( data, -2, {
+	'accessor': getValue
+});
+
+// Deep set arrays...
+for ( i = 0; i < data.length; i++ ) {
+	data[ i ] = {
+		'x': [ i, data[ i ].x ]
+	};
+}
+out = roundn( data, -2, {
+	'path': 'x/1',
+	'sep': '/'
+});
+
+// Typed arrays...
+data = new Float64Array( 10 );
+for ( i = 0; i < data.length; i++ ) {
+	data[ i ] = Math.PI;
+}
+tmp = roundn( data, -2 );
+out = '';
+for ( i = 0; i < data.length; i++ ) {
+	out += tmp[ i ];
+	if ( i < data.length-1 ) {
+		out += ',';
+	}
+}
+
+// Matrices...
+mat = matrix( data, [5,2], 'float64' );
+out = roundn( mat, -2 );
+
+// Matrices (custom output data type)...
+out = roundn( mat, -2, {
+	'dtype': 'uint8'
+});
 ```
 
 To run the example code from the top-level application directory,
